@@ -1,0 +1,12 @@
+Credentials
+*.csv
+*.txt
+Input
+Output
+Input/*.csv
+*.xmind
+logs/*
+.vscode/launch.json
+OLD
+*.zip
+*.pdf
