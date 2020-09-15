@@ -1,55 +1,26 @@
-# This is the script wrapper that should be called for the execution.
-[CmdletBinding()]
-param (
-)
-
-begin {
-    $ErrorActionPreference = "Stop"
-    # Work Folders
-    $FunctionFolder = "Functions"
-    $InputFolder = "Input"
-    $OutputFolder = "Output"
-    $ConfigFolder = "Config"
-    $CredFolder = "Credentials"
-    $ReportFolder = "Reports"
-    # Current path
-    $CurrentPath = $null
-    $CurrentPath = Split-Path -parent $PSCommandPath
-    Set-Location $CurrentPath
-    # Current path
-    $CurrentPath = $null
-    $CurrentPath = Split-Path -parent $PSCommandPath
-    Set-Location $CurrentPath
-
-    # Import functions
-    $functions = Get-ChildItem .\$FunctionFolder
-    foreach ($f in $functions) {
-        #Write-Host -ForegroundColor Cyan "Importing function $f"
-        . .\$FunctionFolder\$f
-
-        $config_file_wc = ".\$ConfigFolder\westcoast.csv" ; $config_wc = Import-Csv $config_file_wc
-        $config_file_xma = ".\$ConfigFolder\xma.csv" ; $config_xma = Import-Csv $config_file_xma
-        $cred_folder = (Get-ChildItem | Where-Object { $_.Name -match $CredFolder }).FullName
-        $report_folder = (Get-ChildItem | Where-Object { $_.Name -match $ReportFolderr }).FullName
+function Connect-MSOnline {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [PSCredential]
+        $AAD_Credential,
+        [string]
+        $SystemDomain
+    )
+    if (!((Get-MsolDomain -DomainName  $SystemDomain -ErrorAction SilentlyContinue).count -le 0)) {
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - MS Online already connected"
     }
-
-    Write-Host -BackgroundColor Black "PHASE2 PROCESS STARTED"    
-}
-
-process {
-    Process-OffBoarding02 -config $config_wc -credfolder $cred_folder -WestCoast -First10 -Dryrun -OutputFolder $("$CurrentPath\$OutputFolder") -summary
-    Process-OffBoarding02 -config $config_xma -credfolder $cred_folder -XMA -First10 -Dryrun -OutputFolder $("$CurrentPath\$OutputFolder") -summary
-}
-
-end {
-
+    else {
+        Connect-MsolService -Credential $AAD_Credential >> $null
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - MS Online not available. Initiating connection"
+    }
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU1ye4BlmQqqrrH6+CIqKe4eIh
-# UYugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU4SJmqTksaKAwAUlJAwmL92u5
+# VPOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -116,11 +87,11 @@ end {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU5jJV/D3opxixxZupCmPX1ocM4m8wDQYJKoZI
-# hvcNAQEBBQAEggEAaOSiezuZDWKyGnKlauGUjjUY5uaeiflVztqplJNliqo4+gmz
-# da8pB1Tk7ewmnjikW2QqPxGuEFDWN1mR9S0Xfb2il/Ati3nu8/45Rnb96nCIauNm
-# 7tbmpFGB1mvtnnTqE595rL3c9c3PnJruM+quYa8DOEjhlFa5Onq0E1ePwVHxor4V
-# lZ0m7f9liHidyLVDhd4WsqbYzKtGWWuBpVztvp9/DV19Jd+CiPsQ8sva9PpWGCvh
-# n/rXswEoP++/buaQmcU6NpGl1L3oawsKxwRw8oWRd8cT/ISaeI8uxp3UrNYl5o3p
-# 75oILKz3oCW4q4eAPjcYrmfyoCnzfXv+BEjy3Q==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUmd6kJ8VD8blxk9MyYRLTmxCNG3kwDQYJKoZI
+# hvcNAQEBBQAEggEAA2lU8GssEV6fwoHMM1gTWPU5GUOcFkq4emabwGYgwhSV7Tee
+# Umj3B8qeM8scB8s+sTyhJsU7xTvWrQeQ/AgQv59lTJ6NlBYTitQP63bDG77VgpPl
+# 7wXZB2RKy3c/LltgTBuT/7KCKFnijqXcaGerRL1xec2BYjk0gQJvWggGgGkRv+uq
+# e/oNeAxT0GgLd4+dx72OINENgTUi076hqHxRsIQNLajFF7PI3/x3W0y6ZVoHG5Ii
+# yUOfJc4q5p/R0VH1OAM3MYp4OOo6EtwWZSFYGOrBzShOXhOQX3RktIvTjmR9O2KJ
+# 9Va3oF3TKmpzV0k3RnvV7np2ZRkMov40rnmxjg==
 # SIG # End signature block

@@ -1,55 +1,36 @@
-# This is the script wrapper that should be called for the execution.
-[CmdletBinding()]
-param (
-)
+function Connect-OnlineExchange {
+  [CmdletBinding()]
+  param (
+      [Parameter()]
+      [PSCredential]
+      $AAD_Credential
+  )
 
-begin {
-    $ErrorActionPreference = "Stop"
-    # Work Folders
-    $FunctionFolder = "Functions"
-    $InputFolder = "Input"
-    $OutputFolder = "Output"
-    $ConfigFolder = "Config"
-    $CredFolder = "Credentials"
-    $ReportFolder = "Reports"
-    # Current path
-    $CurrentPath = $null
-    $CurrentPath = Split-Path -parent $PSCommandPath
-    Set-Location $CurrentPath
-    # Current path
-    $CurrentPath = $null
-    $CurrentPath = Split-Path -parent $PSCommandPath
-    Set-Location $CurrentPath
+  $OpenPSSessions = Get-PSSession
+  # If there is an open session to Office 365, we do not re-connect.
+	if ($OpenPSSessions.ComputerName -contains 'outlook.office365.com' -and $OpenPSSessions.Availability -eq 'Available') {
 
-    # Import functions
-    $functions = Get-ChildItem .\$FunctionFolder
-    foreach ($f in $functions) {
-        #Write-Host -ForegroundColor Cyan "Importing function $f"
-        . .\$FunctionFolder\$f
+$timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Exchange Online already available."
 
-        $config_file_wc = ".\$ConfigFolder\westcoast.csv" ; $config_wc = Import-Csv $config_file_wc
-        $config_file_xma = ".\$ConfigFolder\xma.csv" ; $config_xma = Import-Csv $config_file_xma
-        $cred_folder = (Get-ChildItem | Where-Object { $_.Name -match $CredFolder }).FullName
-        $report_folder = (Get-ChildItem | Where-Object { $_.Name -match $ReportFolderr }).FullName
+  }
+  # If there is no open session, then we do connect
+	else {
+    #If the module is not imported, import it
+    If (!(Get-Module -Name ExchangeOnlineManagement)){
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Importing Exchange Online modules"
+    [void] (Import-Module ExchangeOnlineManagement -Verbose:$false)
     }
-
-    Write-Host -BackgroundColor Black "PHASE2 PROCESS STARTED"    
-}
-
-process {
-    Process-OffBoarding02 -config $config_wc -credfolder $cred_folder -WestCoast -First10 -Dryrun -OutputFolder $("$CurrentPath\$OutputFolder") -summary
-    Process-OffBoarding02 -config $config_xma -credfolder $cred_folder -XMA -First10 -Dryrun -OutputFolder $("$CurrentPath\$OutputFolder") -summary
-}
-
-end {
-
+    #Then connect
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Connecting to Exchange Online."
+    [void] (Connect-ExchangeOnline -Credential $AAD_Credential -ShowProgress $false -ShowBanner:$false)
+	}
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU1ye4BlmQqqrrH6+CIqKe4eIh
-# UYugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUnSy3Pzl2KA9RbuX7sskDQ+uo
+# 626gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -116,11 +97,11 @@ end {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU5jJV/D3opxixxZupCmPX1ocM4m8wDQYJKoZI
-# hvcNAQEBBQAEggEAaOSiezuZDWKyGnKlauGUjjUY5uaeiflVztqplJNliqo4+gmz
-# da8pB1Tk7ewmnjikW2QqPxGuEFDWN1mR9S0Xfb2il/Ati3nu8/45Rnb96nCIauNm
-# 7tbmpFGB1mvtnnTqE595rL3c9c3PnJruM+quYa8DOEjhlFa5Onq0E1ePwVHxor4V
-# lZ0m7f9liHidyLVDhd4WsqbYzKtGWWuBpVztvp9/DV19Jd+CiPsQ8sva9PpWGCvh
-# n/rXswEoP++/buaQmcU6NpGl1L3oawsKxwRw8oWRd8cT/ISaeI8uxp3UrNYl5o3p
-# 75oILKz3oCW4q4eAPjcYrmfyoCnzfXv+BEjy3Q==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUxf7d8MEzMl3ULBjNAULBdabz5P8wDQYJKoZI
+# hvcNAQEBBQAEggEATdPP7yE2PrHGW8KwM6t4Md5lDxVMn+XECUv731J0XVdVl7nU
+# GpAn8GJvd7O9Ugm//7ub7VSeggK2Qf3EY2b+JaS7vq9MWEiIsgAZK+2Evt8FlpL4
+# XBTkluSnB9IR+B7+UsotmeAOP+yu/EzGoOq4Jlwf/GtWYWaxLUUKGlyG0EyYSTHU
+# iNdZn9uP+CNoPQMEOXTWPVHkoRRd3WricFXeIrbQh5e6PFJeIhRk3dnHxaGBLVip
+# 8Dj5b+3KZCTHH7NGFRRKN2cbikzvh5Bp7TGPwRwL0rbTl7dJaYHACnYkmmMC09zw
+# a9vH6u3SD2q22pQHhwpIvIWGXvTzFiElCEborg==
 # SIG # End signature block
