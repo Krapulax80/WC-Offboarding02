@@ -9,7 +9,7 @@ param (
     $login_file_xma_AD = 'c:\Scripts\AD\Offboarding02\Credentials\xma_scriptcreds_AD.xml',  
     $login_file_wc_AAD = 'c:\Scripts\AD\Offboarding02\Credentials\wc_scriptcreds_AAD.xml',
     $login_file_xma_AAD = 'c:\Scripts\AD\Offboarding02\Credentials\xma_scriptcreds_AAD.xml',            
-    $transcriptFolder = ('c:\Scripts\AD\Offboarding02\logs\' + (Get-Date -Format yyy-MM-dd) ),
+    $logFolder = ('c:\Scripts\AD\Offboarding02\logs\' + (Get-Date -Format yyy-MM-dd)),
     [Parameter(Mandatory = $False)]
     [switch]
     $wc,
@@ -23,13 +23,13 @@ BEGIN {
     $ErrorActionPreference = 'Stop'
 
     # declare work folders
-    $FunctionFolder = 'Functions'
-    $InputFolder = 'Input'
-    $OutputFolder = 'Output'
-    $ConfigFolder = 'Config'
-    $loginFolder = 'Credentials'
-    $ReportFolder = 'Reports'
-    $Logs = 'Logs'
+    # $FunctionFolder = 'Functions'
+    # $InputFolder = 'Input'
+    # $OutputFolder = 'Output'
+    # $ConfigFolder = 'Config'
+    # $loginFolder = 'Credentials'
+    # $ReportFolder = 'Reports'
+    # $Logs = 'Logs'
         
     # # save the current path
     # $CurrentPath = $null
@@ -88,8 +88,8 @@ BEGIN {
         }  
     }
 
-    if (-not (Test-Path $transcriptFolder )) {
-        [void] (New-Item -Path $transcriptFolder -ItemType Directory -Force -ErrorAction SilentlyContinue)
+    if (-not (Test-Path $logFolder )) {
+        [void] (New-Item -Path $logFolder -ItemType Directory -Force -ErrorAction SilentlyContinue)
     }
     if ($wc.IsPresent) {
     
@@ -100,7 +100,8 @@ BEGIN {
         $AD_Credential = Import-Clixml -Path $login_file_wc_AD
         $AAD_Credential = Import-Clixml -Path $login_file_wc_AAD
         #Connect-MsolService -Credential $AD_Credential
-        $transcriptFile = ($transcriptFolder + '\transcript_WC.log')
+        $transcriptFile = ($logFolder + '\transcript_WC.log')
+        $errorFile = ($logFolder + '\errors_WC.log')
         Start-Transcript -Path $transcriptFile -Force
     }
     elseif ($xma.IsPresent) {
@@ -111,7 +112,8 @@ BEGIN {
         $AD_Credential = Import-Clixml -Path $login_file_xma_AD
         $AAD_Credential = Import-Clixml -Path $login_file_xma_AAD
         #Connect-MsolService -Credential $AD_Credential
-        $transcriptFile = ($transcriptFolder + '\transcript_XMA.log')
+        $transcriptFile = ($logFolder + '\transcript_XMA.log')
+        $errorFile = ($logFolder + '\errors_XMA.log')
         Start-Transcript -Path $transcriptFile -Force
     }
     else {
@@ -185,10 +187,10 @@ PROCESS {
     #region  delete the AD objects
     # $today = Get-Date -Format ddMM
     # if ($wc.IsPresent) {
-    #     $deletionErrorFile = ($transcriptFolder + '\deletion_WC.log')
+    #     $deletionErrorFile = ($logFolder + '\deletion_WC.log')
     # }
     # elseif ($xma.IsPresent) {
-    #     $deletionErrorFile = ($transcriptFolder + '\deletion_XMA.log')
+    #     $deletionErrorFile = ($logFolder + '\deletion_XMA.log')
     # }
 
     Write-Host #lazy line break
@@ -201,9 +203,10 @@ PROCESS {
         else {
             # live mode
             try {
-                Remove-ADObject -Identity $user.DistinguishedName -Server $DC -Credential $AD_Credential -Recursive -Verbose -Confirm:$false -WhatIf
+                Remove-ADObject -Identity $user.DistinguishedName -Server $DC -Credential $AD_Credential -Recursive -Verbose -Confirm:$false #-ErrorAction Continue #-WhatIf
             }
             catch {
+                $user.DistinguishedName | Out-File $errorFile -Append -Force
                 $_.Exception.Message | Out-File $errorFile -Append -Force
                 Continue
             }
@@ -246,8 +249,8 @@ END {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUSP1pN1pkT13T+wLHPq4qJusM
-# He+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUR8anf2p8Pa8qI0zHmD+EXxNs
+# AKigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -314,11 +317,11 @@ END {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUmV5Ys9adNjuiQhk/yyCoWJknMT4wDQYJKoZI
-# hvcNAQEBBQAEggEAPj1aW8xk6hp0gCl9Ui3fNwggzUHiJIMEp0LkkVnA/UaoTwJ2
-# 082y6rBZz+ggTM9yjM5470ZqY/7x9RW/YRz/AbyP+TtvByEodAvOVTOzXaxx+bX5
-# DP/CebsYBD9IW8nZia6T2cSRyBDHGnF9Rx+mmZNxO/lP+AYRiUQdto0pbQljIJs2
-# EqGaB7OF4oML56ikvo92Kj9AvuTwtIk5oNK/7or2tlcr9o/lrpgywtKMz63mfk0Q
-# /yb8iAef4t/6x/EfSb77g2ln7rRncBl+8QV/UWHey3p05eIt+HFcm0Bw8ocB7gyO
-# 1qchyzSs6SOiXlFXm91jbLHGdOASWlr49H+2lA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUYazk1Z/tc62f/TH2z4bHcWDHgLEwDQYJKoZI
+# hvcNAQEBBQAEggEA1HY091ajYE/auD0JtfVRxTet4JJG4+6NeTjdvCDpstMhEKmy
+# r8r7rlLhKo5kJYmTmnnsF+k6PofoSt9k0E8w4jpmii/YLpSqXZISbnk03JlPkI7G
+# UrlQ6i0GPZ3av1Y+2NZIw5FKiXfFweS3tDuNq25FJjRRs8tz/FGqN05EsNJ4Dobf
+# /6YoSqsj74Cr37EfLoy8Xuo6fWNKwmIuW6NVBrsm9vxYqij1/oeib0WZ4uE+wWGx
+# cvMauEdMbIXQtzt275UgpFTP30SQ+hiCMKBnIFH1hcUrL242giLsddo/RUUg0xkS
+# ATCs7nkJ0C5EEB1CGZT+MEwQK55Ra4KJup+VHg==
 # SIG # End signature block
