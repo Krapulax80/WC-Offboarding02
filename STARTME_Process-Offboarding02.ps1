@@ -1,17 +1,17 @@
 
-& 'C:\Scripts\AD\Offboarding02\Functions\offboarding2.ps1' -wc -Test
-& 'C:\Scripts\AD\Offboarding02\Functions\offboarding2.ps1' -xma -Test
+# & 'C:\Scripts\AD\Offboarding02\Functions\offboarding2.ps1' -wc -Test
+# & 'C:\Scripts\AD\Offboarding02\Functions\offboarding2.ps1' -xma -Test
 
-# & 'C:\Scripts\AD\Offboarding02\Functions\offboarding2.ps1' -wc -Live
-# & 'C:\Scripts\AD\Offboarding02\Functions\offboarding2.ps1' -xma -Live
+& 'C:\Scripts\AD\Offboarding02\Functions\offboarding2.ps1' -wc -Live
+& 'C:\Scripts\AD\Offboarding02\Functions\offboarding2.ps1' -xma -Live
 
 
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU8O4Jsbrhbf/y67HnpyqUo1o5
-# PEGgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUqx6R+Xj5dfrFlv/Fq69QgF1s
+# y4OgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -78,11 +78,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQURiYue90kqIpqGiLhsCVc/JnM9xgwDQYJKoZI
-# hvcNAQEBBQAEggEAwUaYZNaVLJUnWZHtKxmTKX75F4daJ1eTX1a7Mv5+wYrDVg7B
-# IX6LH2oTR7X0D2EpYtM+j/fFuvyS+aKzgB/ier6btMs6KTGkYCAud/YEEmFi4ikp
-# bDxzvGOIxo9htzU52dDZoAVZNrKWIEl8SIcNL601YElE6Y2Ty2hINGbxo+8YDw4p
-# EQ6bCLL/gFxliH8s6NETO6nCW5c0wFRDD/gc9a30FftzLQpTQBWlL7LhZ5TfFsLW
-# X2EJOM3noEEH04sLESVUaEMaSJ+cQUrYa9xe8rl67i4IJ/ICWhCDRF4UcdMRhwrK
-# Xdrk/lB4Uibojk/S2EQluzlK4FwZgtzaRsGDIQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUVURi/rNmZztb+yMaVWYtubvcc1MwDQYJKoZI
+# hvcNAQEBBQAEggEAk31lpGLvFcAhkxsyEgqHqZuzB6E9Ih0nUZ7x8YMatdAjzmF2
+# 8mrYgsb312wZcvjicf6MN259gXMzGMbot/gg498f/cceILMExpTEWma8HMABrtNz
+# 0lTrqPc4rngm/anfw1u+bZBIi9Wi3Run4yi1iBZzUBeqVWttDdbSj015NqCZPuVj
+# /XsH2RLbPzNuWuSumEOCFovDlMZsllkR3gRRpE1XXvmBWphGcfKPGb6wXYpniyuw
+# jx/7WIEVAP5NhtF/+BGJYxQmnurKu3UrYFEO1cK37y/jYqeuihpS/zdQzjHhfFok
+# PhlqyUt4jWMUQKHsjLryAfYBX473nzhclvKq1A==
 # SIG # End signature block
